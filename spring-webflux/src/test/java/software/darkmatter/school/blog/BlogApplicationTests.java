@@ -1,10 +1,10 @@
-package software.darkmatter.school.springwebflux;
+package software.darkmatter.school.blog;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SpringWebfluxApplicationTests {
+class BlogApplicationTests {
 
     @Test
     void contextLoads() {

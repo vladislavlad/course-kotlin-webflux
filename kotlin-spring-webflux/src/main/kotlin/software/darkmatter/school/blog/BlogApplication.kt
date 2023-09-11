@@ -1,11 +1,11 @@
-package software.darkmatter.school.kotlinspringwebflux
+package software.darkmatter.school.blog
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class KotlinSpringWebfluxApplication
+class BlogApplication
 
 fun main(args: Array<String>) {
-    runApplication<KotlinSpringWebfluxApplication>(*args)
+    runApplication<BlogApplication>(*args)
 }

@@ -1,0 +1,11 @@
+version: '3.9'
+services:
+
+  postgres:
+    image: postgres:15.4-alpine
+    environment:
+      POSTGRES_USER: "blog"
+      POSTGRES_PASSWORD: "blog"
+      POSTGRES_DB: "blog"
+    ports:
+      - "5432:5432"

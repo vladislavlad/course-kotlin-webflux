@@ -1,1 +1,10 @@
-
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/blog
+    username: blog
+    password: blog
+  jpa:
+    hibernate:
+      ddl-auto: validate
+#  flyway:
+#    baseline-on-migrate: true
