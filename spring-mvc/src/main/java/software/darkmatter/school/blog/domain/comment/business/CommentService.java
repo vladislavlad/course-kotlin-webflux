@@ -9,13 +9,13 @@ import java.util.List;
 
 public interface CommentService {
 
-    List<Comment> getList(Pageable pageable);
+    List<Comment> getListByPostId(Long postId, Pageable pageable);
 
     Comment getById(Long id);
 
     Comment getByPostIdAndId(Long postId, Long id);
 
-    Comment create(CommentCreateDto createDto);
+    Comment create(Long postId, CommentCreateDto createDto);
 
     Comment update(Long id, CommentUpdateDto updateDto);
 

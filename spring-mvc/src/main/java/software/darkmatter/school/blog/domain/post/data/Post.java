@@ -39,5 +39,11 @@ public class Post {
     @JoinColumn(name = "updated_by_user_id")
     private User updatedBy;
 
+    private OffsetDateTime deletedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "deleted_by_user_id")
+    private User deletedBy;
+
     private OffsetDateTime publishedAt;
 }

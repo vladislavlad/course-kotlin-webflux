@@ -16,7 +16,6 @@ import software.darkmatter.school.blog.domain.user.data.User;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +26,9 @@ public class CommentServiceImpl implements CommentService {
     private final PostService postService;
 
     @Override
-    public List<Comment> getList(Pageable pageable) {
-        return repository.findAll(pageable).stream()
-                         .collect(Collectors.toList());
+    public List<Comment> getListByPostId(Long postId, Pageable pageable) {
+        Post post = postService.getById(postId);
+        return repository.findAllByPostAndDeletedAtIsNull(post, pageable);
     }
 
     @Override
@@ -46,9 +45,9 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    public Comment create(CommentCreateDto createDto) {
+    public Comment create(Long postId, CommentCreateDto createDto) {
         User user = userService.getById(createDto.userId());
-        Post post = postService.getById(createDto.postId());
+        Post post = postService.getById(postId);
         var comment = new Comment();
         comment.setPost(post);
         comment.setText(createDto.text());
@@ -68,7 +67,11 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        // Implementation here
+        Comment comment = getById(id);
+        comment.setDeletedAt(OffsetDateTime.now());
+        // add deleteBy
+        repository.save(comment);
     }
 }

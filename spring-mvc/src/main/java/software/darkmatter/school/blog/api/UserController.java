@@ -27,12 +27,12 @@ public class UserController {
 
     @PostMapping
     public UserDto create(@RequestBody UserCreateDto userCreateDto) {
-        return convertToDto(userService.createUser(userCreateDto));
+        return convertToDto(userService.create(userCreateDto));
     }
 
     @PutMapping("/{id}")
     public UserDto update(@PathVariable Long id, @RequestBody UserCreateDto userCreateDto) {
-        return convertToDto(userService.updateUser(id, userCreateDto));
+        return convertToDto(userService.update(id, userCreateDto));
     }
 
     private UserDto convertToDto(User user) {

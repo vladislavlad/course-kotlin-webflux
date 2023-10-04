@@ -12,11 +12,13 @@ create table posts (
     title varchar(255),
     summary varchar(255),
     content varchar(255),
+    published_at timestamp with time zone,
     created_at timestamp with time zone,
     created_by_user_id bigint,
     updated_at timestamp with time zone,
     updated_by_user_id bigint,
-    published_at timestamp with time zone
+    deleted_at timestamp with time zone,
+    deleted_by_user_id bigint
 );
 
 create table comments (

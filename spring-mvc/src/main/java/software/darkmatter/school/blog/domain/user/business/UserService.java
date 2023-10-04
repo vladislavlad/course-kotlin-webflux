@@ -9,8 +9,12 @@ import java.util.List;
 public interface UserService {
 
     List<User> getList(Pageable pageable);
+
     User getById(Long id);
-    User createUser(UserCreateDto userCreateDto);
-    User updateUser(Long id, UserCreateDto userCreateDto);
-    void deleteUser(Long id);
+
+    User create(UserCreateDto userCreateDto);
+
+    User update(Long id, UserCreateDto userCreateDto);
+
+    void delete(Long id);
 }

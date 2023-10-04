@@ -56,6 +56,8 @@ public class PostServiceImpl implements PostService {
         post.setTitle(postCreateDto.title());
         post.setSummary(postCreateDto.summary());
         post.setContent(postCreateDto.content());
+        post.setUpdatedAt(OffsetDateTime.now());
+        // add updateBy
         return repository.save(post);
     }
 
@@ -68,7 +70,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        repository.deleteById(id);
+        Post post = getById(id);
+        post.setDeletedAt(OffsetDateTime.now());
+        // add deleteBy
+        repository.save(post);
     }
 }

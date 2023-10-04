@@ -1,7 +1,9 @@
 package software.darkmatter.school.blog.api;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,12 +28,12 @@ public class CommentController {
     private final CommentService service;
 
     @GetMapping("/posts/{postId}/comments")
-    public List<CommentDto> list(
+    public List<CommentDto> getListByPost(
         @PathVariable Long postId,
         @RequestParam(defaultValue = "0") Integer page,
         @RequestParam(defaultValue = "20") Integer size
     ) {
-        return service.getList(Pageable.ofSize(size).withPage(page))
+        return service.getListByPostId(postId, Pageable.ofSize(size).withPage(page))
                       .stream()
                       .map(this::convertToDto)
                       .collect(Collectors.toList());
@@ -51,8 +53,11 @@ public class CommentController {
     }
 
     @PostMapping("/posts/{postId}/comments")
-    public CommentDto create(@RequestBody CommentCreateDto commentCreateDto) {
-        return convertToDto(service.create(commentCreateDto));
+    public CommentDto create(
+        @PathVariable Long postId,
+        @Valid @RequestBody CommentCreateDto commentCreateDto
+    ) {
+        return convertToDto(service.create(postId, commentCreateDto));
     }
 
     @PutMapping("/comments/{id}")
@@ -60,8 +65,14 @@ public class CommentController {
         return convertToDto(service.update(id, updateDto));
     }
 
+    @DeleteMapping("/comments/{id}")
+    public void delete(@PathVariable Long id) {
+        service.delete(id);
+    }
+
     private CommentDto convertToDto(Comment comment) {
         return new CommentDto(
+            comment.getId(),
             comment.getText(),
             comment.getCreatedAt(),
             new UserDto(

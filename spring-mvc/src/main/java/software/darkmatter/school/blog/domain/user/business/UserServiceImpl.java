@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User createUser(UserCreateDto userCreateDto) {
+    public User create(UserCreateDto userCreateDto) {
         User user = new User();
         user.setFirstName(userCreateDto.firstName());
         user.setLastName(userCreateDto.lastName());
@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User updateUser(Long id, UserCreateDto userCreateDto) {
+    public User update(Long id, UserCreateDto userCreateDto) {
         User user = getById(id);
         user.setFirstName(userCreateDto.firstName());
         user.setLastName(userCreateDto.lastName());
@@ -53,7 +53,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long id) {
-        repository.deleteById(id);
+    @Transactional
+    public void delete(Long id) {
+        User user = getById(id);
+        user.setDeletedAt(OffsetDateTime.now());
+        // add deleteBy
+        repository.save(user);
     }
 }
