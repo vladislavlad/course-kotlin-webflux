@@ -58,27 +58,27 @@ public class CommentServiceImplTest {
 
     @Test
     public void getByIdNotFound() {
-        when(repository.findById(COMMENT_ID)).thenReturn(Optional.of(comment));
+        when(repository.findByIdAndDeletedAtIsNull(COMMENT_ID)).thenReturn(Optional.of(comment));
         when(repository.findById(2L)).thenThrow(new CommentNotFoundException(2L));
 
         Comment found = service.getById(COMMENT_ID);
 
-        verify(repository).findById(COMMENT_ID);
+        verify(repository).findByIdAndDeletedAtIsNull(COMMENT_ID);
         assertThat(found).isNotNull();
         assertThat(found.getId()).isEqualTo(COMMENT_ID);
 
         assertThrows(CommentNotFoundException.class, () -> service.getById(2L));
-        verify(repository).findById(2L);
+        verify(repository).findByIdAndDeletedAtIsNull(2L);
     }
 
     @Test
     public void update() {
-        when(repository.findById(COMMENT_ID)).thenReturn(Optional.of(comment));
+        when(repository.findByIdAndDeletedAtIsNull(COMMENT_ID)).thenReturn(Optional.of(comment));
         when(repository.save(any())).then(AdditionalAnswers.returnsFirstArg());
 
         Comment updated = service.update(1L, new CommentUpdateDto("upd text"));
 
-        verify(repository).findById(COMMENT_ID);
+        verify(repository).findByIdAndDeletedAtIsNull(COMMENT_ID);
         verify(repository).save(any());
 
         assertThat(updated.getId()).isEqualTo(POST_ID);

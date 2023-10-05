@@ -49,29 +49,29 @@ public class PostServiceImplTest {
 
     @Test
     public void getByIdNotFound() {
-        when(repository.findById(POST_ID)).thenReturn(Optional.of(post));
-        when(repository.findById(2L)).thenThrow(new PostNotFoundException(2L));
+        when(repository.findByIdAndDeletedAtIsNull(POST_ID)).thenReturn(Optional.of(post));
+        when(repository.findByIdAndDeletedAtIsNull(2L)).thenThrow(new PostNotFoundException(2L));
 
         Post found = service.getById(POST_ID);
 
-        verify(repository).findById(POST_ID);
+        verify(repository).findByIdAndDeletedAtIsNull(POST_ID);
         assertThat(found).isNotNull();
         assertThat(found.getId()).isEqualTo(POST_ID);
 
         assertThrows(PostNotFoundException.class, () -> service.getById(2L));
-        verify(repository).findById(2L);
+        verify(repository).findByIdAndDeletedAtIsNull(2L);
     }
 
     @Test
     public void update() {
-        when(repository.findById(POST_ID)).thenReturn(Optional.of(post));
+        when(repository.findByIdAndDeletedAtIsNull(POST_ID)).thenReturn(Optional.of(post));
         when(repository.save(any())).then(AdditionalAnswers.returnsFirstArg());
 
         OffsetDateTime updatedAt = post.getUpdatedAt();
 
         Post updated = service.update(1L, new PostCreateDto(USER_ID, "upd title", "upd summary", "upd content"));
 
-        verify(repository).findById(POST_ID);
+        verify(repository).findByIdAndDeletedAtIsNull(POST_ID);
         verify(repository).save(any());
 
         assertThat(updated.getId()).isEqualTo(POST_ID);
@@ -83,14 +83,14 @@ public class PostServiceImplTest {
 
     @Test
     public void delete() {
-        when(repository.findById(POST_ID)).thenReturn(Optional.of(post));
+        when(repository.findByIdAndDeletedAtIsNull(POST_ID)).thenReturn(Optional.of(post));
         when(repository.save(any())).then(AdditionalAnswers.returnsFirstArg());
 
         OffsetDateTime updatedAt = post.getUpdatedAt();
 
         service.delete(1L);
 
-        verify(repository).findById(POST_ID);
+        verify(repository).findByIdAndDeletedAtIsNull(POST_ID);
         verify(repository).save(any());
 
         assertThat(post.getDeletedAt()).isNotNull();
@@ -104,14 +104,14 @@ public class PostServiceImplTest {
 
     @Test
     public void publish() {
-        when(repository.findById(POST_ID)).thenReturn(Optional.of(post));
+        when(repository.findByIdAndDeletedAtIsNull(POST_ID)).thenReturn(Optional.of(post));
         when(repository.save(any())).then(AdditionalAnswers.returnsFirstArg());
 
         OffsetDateTime updatedAt = post.getUpdatedAt();
 
         service.publish(1L);
 
-        verify(repository).findById(POST_ID);
+        verify(repository).findByIdAndDeletedAtIsNull(POST_ID);
         verify(repository).save(any());
 
         assertThat(post.getPublishedAt()).isNotNull();

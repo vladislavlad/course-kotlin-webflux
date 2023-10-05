@@ -33,7 +33,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment getById(Long id) {
-        return repository.findById(id)
+        return repository.findByIdAndDeletedAtIsNull(id)
                          .orElseThrow(() -> new CommentNotFoundException(id));
     }
 

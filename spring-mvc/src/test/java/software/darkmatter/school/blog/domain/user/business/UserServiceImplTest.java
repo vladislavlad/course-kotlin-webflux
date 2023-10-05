@@ -42,29 +42,29 @@ public class UserServiceImplTest {
 
     @Test
     public void getByIdNotFound() {
-        when(repository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(repository.findByIdAndDeletedAtIsNull(USER_ID)).thenReturn(Optional.of(user));
         when(repository.findById(2L)).thenThrow(new UserNotFoundException(2L));
 
         User found = service.getById(USER_ID);
 
-        verify(repository).findById(USER_ID);
+        verify(repository).findByIdAndDeletedAtIsNull(USER_ID);
         assertThat(found).isNotNull();
         assertThat(found.getId()).isEqualTo(USER_ID);
 
         assertThrows(UserNotFoundException.class, () -> service.getById(2L));
-        verify(repository).findById(2L);
+        verify(repository).findByIdAndDeletedAtIsNull(2L);
     }
 
     @Test
     public void update() {
-        when(repository.findById(USER_ID)).thenReturn(Optional.of(user));
+        when(repository.findByIdAndDeletedAtIsNull(USER_ID)).thenReturn(Optional.of(user));
         when(repository.save(any())).then(AdditionalAnswers.returnsFirstArg());
 
         OffsetDateTime updatedAt = user.getUpdatedAt();
 
         User updated = service.update(1L, new UserCreateDto("upd firstName", "upd lastName"));
 
-        verify(repository).findById(USER_ID);
+        verify(repository).findByIdAndDeletedAtIsNull(USER_ID);
         verify(repository).save(any());
 
         assertThat(updated.getId()).isEqualTo(USER_ID);

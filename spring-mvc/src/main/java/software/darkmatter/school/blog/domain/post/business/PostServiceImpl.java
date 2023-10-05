@@ -13,7 +13,6 @@ import software.darkmatter.school.blog.domain.user.data.User;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,13 +23,12 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<Post> getList(Pageable pageable) {
-        return repository.findAll(pageable).stream()
-                         .collect(Collectors.toList());
+        return repository.findAllByDeletedAtIsNull(pageable);
     }
 
     @Override
     public Post getById(Long id) {
-        return repository.findById(id)
+        return repository.findByIdAndDeletedAtIsNull(id)
                          .orElseThrow(() -> new PostNotFoundException(id));
     }
 

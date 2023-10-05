@@ -11,7 +11,6 @@ import software.darkmatter.school.blog.domain.user.error.UserNotFoundException;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,13 +20,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getList(Pageable pageable) {
-        return repository.findAll(pageable).stream()
-                         .collect(Collectors.toList());
+        return repository.findAllByDeletedAtIsNull(pageable);
     }
 
     @Override
     public User getById(Long id) {
-        return repository.findById(id)
+        return repository.findByIdAndDeletedAtIsNull(id)
                          .orElseThrow(() -> new UserNotFoundException(id));
     }
 
