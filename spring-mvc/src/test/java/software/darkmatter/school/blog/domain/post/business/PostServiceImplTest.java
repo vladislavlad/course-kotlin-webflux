@@ -3,7 +3,9 @@ package software.darkmatter.school.blog.domain.post.business;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
+import org.springframework.security.core.context.SecurityContextHolder;
 import software.darkmatter.school.blog.api.dto.PostCreateDto;
+import software.darkmatter.school.blog.config.security.SimpleAuthentication;
 import software.darkmatter.school.blog.domain.post.data.Post;
 import software.darkmatter.school.blog.domain.post.data.PostRepository;
 import software.darkmatter.school.blog.domain.post.error.PostNotFoundException;
@@ -18,6 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static software.darkmatter.school.blog.domain.Constants.TEST_USER;
 
 public class PostServiceImplTest {
 
@@ -45,6 +48,8 @@ public class PostServiceImplTest {
         post.setCreatedAt(now);
         post.setUpdatedAt(now);
         post.setPublishedAt(null);
+
+        SecurityContextHolder.getContext().setAuthentication(new SimpleAuthentication(TEST_USER.getId(), TEST_USER.getFirstName()));
     }
 
     @Test
@@ -69,7 +74,7 @@ public class PostServiceImplTest {
 
         OffsetDateTime updatedAt = post.getUpdatedAt();
 
-        Post updated = service.update(1L, new PostCreateDto(USER_ID, "upd title", "upd summary", "upd content"));
+        Post updated = service.update(1L, new PostCreateDto("upd title", "upd summary", "upd content"));
 
         verify(repository).findByIdAndDeletedAtIsNull(POST_ID);
         verify(repository).save(any());

@@ -1,6 +1,7 @@
 package software.darkmatter.school.blog.domain.post.data;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,19 +30,19 @@ public class Post {
 
     private OffsetDateTime createdAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "created_by_user_id")
     private User createdBy;
 
     private OffsetDateTime updatedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "updated_by_user_id")
     private User updatedBy;
 
     private OffsetDateTime deletedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "deleted_by_user_id")
     private User deletedBy;
 

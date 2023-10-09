@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotNull;
 
 public record PostCreateDto(
     @NotNull
-    Long userId,
-    @NotNull
     String title,
     String summary,
     @NotNull

@@ -34,6 +34,7 @@ public class UserServiceImplTest {
 
         user = new User();
         user.setId(USER_ID);
+        user.setUsername("username");
         user.setFirstName("firstName");
         user.setLastName("lastName");
         user.setCreatedAt(now);
@@ -62,12 +63,13 @@ public class UserServiceImplTest {
 
         OffsetDateTime updatedAt = user.getUpdatedAt();
 
-        User updated = service.update(1L, new UserCreateDto("upd firstName", "upd lastName"));
+        User updated = service.update(1L, new UserCreateDto("upd username", "upd firstName", "upd lastName"));
 
         verify(repository).findByIdAndDeletedAtIsNull(USER_ID);
         verify(repository).save(any());
 
         assertThat(updated.getId()).isEqualTo(USER_ID);
+        assertThat(updated.getUsername()).isEqualTo("upd username");
         assertThat(updated.getFirstName()).isEqualTo("upd firstName");
         assertThat(updated.getLastName()).isEqualTo("upd lastName");
         assertThat(updated.getUpdatedAt()).isNotEqualTo(updatedAt);

@@ -4,7 +4,5 @@ import jakarta.validation.constraints.NotNull;
 
 public record CommentCreateDto(
     @NotNull
-    Long userId,
-    @NotNull
     String text
 ) {}

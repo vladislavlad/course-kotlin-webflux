@@ -47,6 +47,7 @@ public class UserController {
     private UserDto convertToDto(User user) {
         return new UserDto(
             user.getId(),
+            user.getUsername(),
             user.getFirstName(),
             user.getLastName()
         );

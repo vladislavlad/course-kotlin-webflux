@@ -3,7 +3,9 @@ package software.darkmatter.school.blog.domain.comment.business;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
+import org.springframework.security.core.context.SecurityContextHolder;
 import software.darkmatter.school.blog.api.dto.CommentUpdateDto;
+import software.darkmatter.school.blog.config.security.SimpleAuthentication;
 import software.darkmatter.school.blog.domain.comment.data.Comment;
 import software.darkmatter.school.blog.domain.comment.data.CommentRepository;
 import software.darkmatter.school.blog.domain.comment.error.CommentNotFoundException;
@@ -20,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static software.darkmatter.school.blog.domain.Constants.TEST_USER;
 
 public class CommentServiceImplTest {
 
@@ -54,6 +57,8 @@ public class CommentServiceImplTest {
         comment.setText("text");
         comment.setCreatedAt(now);
         comment.setUpdatedAt(now);
+
+        SecurityContextHolder.getContext().setAuthentication(new SimpleAuthentication(TEST_USER.getId(), TEST_USER.getFirstName()));
     }
 
     @Test

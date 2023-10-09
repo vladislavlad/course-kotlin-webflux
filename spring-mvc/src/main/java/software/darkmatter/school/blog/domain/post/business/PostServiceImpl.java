@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.darkmatter.school.blog.api.dto.PostCreateDto;
+import software.darkmatter.school.blog.config.security.SimpleAuthentication;
 import software.darkmatter.school.blog.domain.post.data.Post;
 import software.darkmatter.school.blog.domain.post.data.PostRepository;
 import software.darkmatter.school.blog.domain.post.error.PostNotFoundException;
@@ -13,6 +14,8 @@ import software.darkmatter.school.blog.domain.user.data.User;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+
+import static software.darkmatter.school.blog.config.security.SimpleAuthentication.simpleAuthFromContext;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +38,9 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Post create(PostCreateDto postCreateDto) {
-        User user = userService.getById(postCreateDto.userId());
+        var authentication = simpleAuthFromContext();
+        User user = userService.getById(authentication.getUserId());
+
         var post = new Post();
         post.setTitle(postCreateDto.title());
         post.setSummary(postCreateDto.summary());
@@ -50,12 +55,15 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Post update(Long id, PostCreateDto postCreateDto) {
+        var authentication = simpleAuthFromContext();
+        User user = userService.getById(authentication.getUserId());
+
         Post post = getById(id);
         post.setTitle(postCreateDto.title());
         post.setSummary(postCreateDto.summary());
         post.setContent(postCreateDto.content());
         post.setUpdatedAt(OffsetDateTime.now());
-        // add updateBy
+        post.setUpdatedBy(user);
         return repository.save(post);
     }
 
@@ -70,9 +78,12 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public void delete(Long id) {
+        var authentication = simpleAuthFromContext();
+        User user = userService.getById(authentication.getUserId());
+
         Post post = getById(id);
         post.setDeletedAt(OffsetDateTime.now());
-        // add deleteBy
+        post.setDeletedBy(user);
         repository.save(post);
     }
 }

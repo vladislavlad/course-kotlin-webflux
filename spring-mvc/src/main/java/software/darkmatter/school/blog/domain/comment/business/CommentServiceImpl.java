@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.darkmatter.school.blog.api.dto.CommentCreateDto;
 import software.darkmatter.school.blog.api.dto.CommentUpdateDto;
+import software.darkmatter.school.blog.config.security.SimpleAuthentication;
 import software.darkmatter.school.blog.domain.comment.data.Comment;
 import software.darkmatter.school.blog.domain.comment.data.CommentRepository;
 import software.darkmatter.school.blog.domain.comment.error.CommentNotFoundException;
@@ -16,6 +17,8 @@ import software.darkmatter.school.blog.domain.user.data.User;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+
+import static software.darkmatter.school.blog.config.security.SimpleAuthentication.simpleAuthFromContext;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +49,9 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public Comment create(Long postId, CommentCreateDto createDto) {
-        User user = userService.getById(createDto.userId());
+        var authentication = simpleAuthFromContext();
+        User user = userService.getById(authentication.getUserId());
+
         Post post = postService.getById(postId);
         var comment = new Comment();
         comment.setPost(post);
@@ -61,17 +66,25 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public Comment update(Long id, CommentUpdateDto updateDto) {
+        var authentication = simpleAuthFromContext();
+        User user = userService.getById(authentication.getUserId());
+
         Comment comment = getById(id);
         comment.setText(updateDto.text());
+        comment.setUpdatedAt(OffsetDateTime.now());
+        comment.setUpdatedBy(user);
         return repository.save(comment);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
+        var authentication = simpleAuthFromContext();
+        User user = userService.getById(authentication.getUserId());
+
         Comment comment = getById(id);
         comment.setDeletedAt(OffsetDateTime.now());
-        // add deleteBy
+        comment.setDeletedBy(user);
         repository.save(comment);
     }
 }

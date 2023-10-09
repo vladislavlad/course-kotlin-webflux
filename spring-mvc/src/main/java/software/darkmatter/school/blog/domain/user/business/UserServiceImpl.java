@@ -44,6 +44,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User update(Long id, UserCreateDto userCreateDto) {
         User user = getById(id);
+        user.setUsername(userCreateDto.username());
         user.setFirstName(userCreateDto.firstName());
         user.setLastName(userCreateDto.lastName());
         user.setUpdatedAt(OffsetDateTime.now());
