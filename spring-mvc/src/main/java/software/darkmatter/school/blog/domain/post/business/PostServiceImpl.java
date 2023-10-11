@@ -5,7 +5,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.darkmatter.school.blog.api.dto.PostCreateDto;
-import software.darkmatter.school.blog.config.security.SimpleAuthentication;
 import software.darkmatter.school.blog.domain.post.data.Post;
 import software.darkmatter.school.blog.domain.post.data.PostRepository;
 import software.darkmatter.school.blog.domain.post.error.PostNotFoundException;

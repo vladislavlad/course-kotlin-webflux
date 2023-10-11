@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.darkmatter.school.blog.api.dto.CommentCreateDto;
 import software.darkmatter.school.blog.api.dto.CommentUpdateDto;
-import software.darkmatter.school.blog.config.security.SimpleAuthentication;
 import software.darkmatter.school.blog.domain.comment.data.Comment;
 import software.darkmatter.school.blog.domain.comment.data.CommentRepository;
 import software.darkmatter.school.blog.domain.comment.error.CommentNotFoundException;

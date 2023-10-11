@@ -56,7 +56,6 @@ public class UserServiceImpl implements UserService {
     public void delete(Long id) {
         User user = getById(id);
         user.setDeletedAt(OffsetDateTime.now());
-        // add deleteBy
         repository.save(user);
     }
 }
