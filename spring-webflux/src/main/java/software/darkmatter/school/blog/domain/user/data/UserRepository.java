@@ -1,4 +1,4 @@
-package software.darkmatter.school.blog.domain.user.domain;
+package software.darkmatter.school.blog.domain.user.data;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;

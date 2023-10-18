@@ -1,5 +1,6 @@
 package software.darkmatter.school.blog.api;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,17 +15,14 @@ import reactor.core.publisher.Mono;
 import software.darkmatter.school.blog.api.dto.UserCreateDto;
 import software.darkmatter.school.blog.api.dto.UserDto;
 import software.darkmatter.school.blog.domain.user.business.UserService;
-import software.darkmatter.school.blog.domain.user.domain.User;
+import software.darkmatter.school.blog.domain.user.data.User;
 
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @GetMapping("/{id}")
     public Mono<UserDto> getById(@PathVariable Long id) {

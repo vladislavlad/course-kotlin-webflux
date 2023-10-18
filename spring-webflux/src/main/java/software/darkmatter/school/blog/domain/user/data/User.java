@@ -1,4 +1,4 @@
-package software.darkmatter.school.blog.domain.user.domain;
+package software.darkmatter.school.blog.domain.user.data;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
