@@ -22,30 +22,30 @@ import software.darkmatter.school.blog.domain.user.data.User;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserService service;
 
     @GetMapping("/{id}")
     public Mono<UserDto> getById(@PathVariable Long id) {
-        return userService.getById(id)
-                          .map(this::convertToDto);
+        return service.getById(id)
+                      .map(this::convertToDto);
     }
 
     @PostMapping
     public Mono<UserDto> create(@RequestBody UserCreateDto userCreateDto) {
-        return userService.create(userCreateDto)
-                          .map(this::convertToDto);
+        return service.create(userCreateDto)
+                      .map(this::convertToDto);
     }
 
     @PutMapping("/{id}")
     public Mono<UserDto> update(@PathVariable Long id, @RequestBody UserCreateDto userCreateDto) {
-        return userService.update(id, userCreateDto)
-                          .map(this::convertToDto);
+        return service.update(id, userCreateDto)
+                      .map(this::convertToDto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> delete(@PathVariable Long id) {
-        return userService.delete(id);
+        return service.delete(id);
     }
 
     private UserDto convertToDto(User user) {
