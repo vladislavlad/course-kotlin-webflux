@@ -10,4 +10,6 @@ public interface CommentRepository extends ReactiveCrudRepository<Comment, Long>
     Mono<Comment> findByIdAndDeletedAtIsNull(Long id);
 
     Flux<Comment> findAllByPostIdAndDeletedAtIsNull(Long postId, Pageable pageable);
+
+    Mono<Comment> findByPostIdAndIdAndDeletedAtIsNull(Long postId, Long id);
 }

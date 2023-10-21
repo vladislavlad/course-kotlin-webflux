@@ -45,9 +45,10 @@ public class PostServiceImpl implements PostService {
                               post.setTitle(postCreateDto.title());
                               post.setSummary(postCreateDto.summary());
                               post.setContent(postCreateDto.content());
-                              post.setCreatedAt(OffsetDateTime.now());
+                              OffsetDateTime now = OffsetDateTime.now();
+                              post.setCreatedAt(now);
                               post.setCreatedByUserId(user.getId());
-                              post.setUpdatedAt(OffsetDateTime.now());
+                              post.setUpdatedAt(now);
                               post.setUpdatedByUserId(user.getId());
                               return repository.save(post);
                           });

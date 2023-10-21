@@ -37,8 +37,9 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setFirstName(userCreateDto.firstName());
         user.setLastName(userCreateDto.lastName());
-        user.setCreatedAt(OffsetDateTime.now());
-        user.setUpdatedAt(OffsetDateTime.now());
+        OffsetDateTime now = OffsetDateTime.now();
+        user.setCreatedAt(now);
+        user.setUpdatedAt(now);
         return repository.save(user);
     }
 
