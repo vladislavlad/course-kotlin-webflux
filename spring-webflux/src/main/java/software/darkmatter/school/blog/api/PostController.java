@@ -66,19 +66,25 @@ public class PostController {
     }
 
     private PostDto convertToDto(Post post) {
+        UserDto createdBy;
+        if (post.getCreatedBy() != null) {
+            createdBy = new UserDto(
+                post.getCreatedByUserId(),
+                post.getCreatedBy().getUsername(),
+                post.getCreatedBy().getFirstName(),
+                post.getCreatedBy().getLastName()
+            );
+        } else {
+            createdBy = new UserDto(post.getCreatedByUserId(), null, null, null);
+        }
+
         return new PostDto(
             post.getId(),
             post.getTitle(),
             post.getSummary(),
             post.getContent(),
             post.getCreatedAt(),
-            // TODO
-            new UserDto(
-                post.getCreatedByUserId(),
-                "u",
-                "f",
-                "l"
-            ),
+            createdBy,
             post.getUpdatedAt(),
             post.getPublishedAt()
         );

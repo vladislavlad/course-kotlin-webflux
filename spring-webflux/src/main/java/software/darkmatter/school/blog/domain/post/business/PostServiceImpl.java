@@ -32,46 +32,59 @@ public class PostServiceImpl implements PostService {
     public Mono<Post> getById(Long id) {
         return repository.findByIdAndDeletedAtIsNull(id).switchIfEmpty(
             Mono.error(() -> new PostNotFoundException(id))
+        ).flatMap(post ->
+                      userService.getById(post.getCreatedByUserId())
+                                 .map(
+                                     user -> {
+                                         post.setCreatedBy(user);
+                                         return post;
+                                     }
+                                 )
         );
     }
 
     @Override
     @Transactional
     public Mono<Post> create(PostCreateDto postCreateDto) {
-        var authentication = simpleAuthFromContext();
-        return userService.getById(authentication.getUserId())
-                          .flatMap(user -> {
-                              var post = new Post();
-                              post.setTitle(postCreateDto.title());
-                              post.setSummary(postCreateDto.summary());
-                              post.setContent(postCreateDto.content());
-                              OffsetDateTime now = OffsetDateTime.now();
-                              post.setCreatedAt(now);
-                              post.setCreatedByUserId(user.getId());
-                              post.setUpdatedAt(now);
-                              post.setUpdatedByUserId(user.getId());
-                              return repository.save(post);
-                          });
+        return simpleAuthFromContext()
+            .flatMap(
+                authentication ->
+                    userService.getById(authentication.getUserId())
+                               .flatMap(user -> {
+                                   var post = new Post();
+                                   post.setTitle(postCreateDto.title());
+                                   post.setSummary(postCreateDto.summary());
+                                   post.setContent(postCreateDto.content());
+                                   OffsetDateTime now = OffsetDateTime.now();
+                                   post.setCreatedAt(now);
+                                   post.setCreatedByUserId(user.getId());
+                                   post.setUpdatedAt(now);
+                                   post.setUpdatedByUserId(user.getId());
+                                   return repository.save(post);
+                               })
+            );
     }
 
     @Override
     @Transactional
     public Mono<Post> update(Long id, PostCreateDto postCreateDto) {
-        var authentication = simpleAuthFromContext();
-        return Mono.zip(
-            userService.getById(authentication.getUserId()),
-            getById(id)
-        ).flatMap((pair) -> {
-            var user = pair.getT1();
-            var post = pair.getT2();
+        return simpleAuthFromContext().flatMap(
+            authentication ->
+                Mono.zip(
+                    userService.getById(authentication.getUserId()),
+                    getById(id)
+                ).flatMap((pair) -> {
+                    var user = pair.getT1();
+                    var post = pair.getT2();
 
-            post.setTitle(postCreateDto.title());
-            post.setSummary(postCreateDto.summary());
-            post.setContent(postCreateDto.content());
-            post.setUpdatedAt(OffsetDateTime.now());
-            post.setUpdatedByUserId(user.getId());
-            return repository.save(post);
-        });
+                    post.setTitle(postCreateDto.title());
+                    post.setSummary(postCreateDto.summary());
+                    post.setContent(postCreateDto.content());
+                    post.setUpdatedAt(OffsetDateTime.now());
+                    post.setUpdatedByUserId(user.getId());
+                    return repository.save(post);
+                })
+        );
     }
 
     @Override
@@ -79,7 +92,7 @@ public class PostServiceImpl implements PostService {
     public Mono<Void> publish(Long id) {
         return getById(id)
             .flatMap(post -> {
-                post.setUpdatedAt(OffsetDateTime.now());
+                post.setPublishedAt(OffsetDateTime.now());
                 return repository.save(post);
             })
             .then();
@@ -88,17 +101,19 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Mono<Void> delete(Long id) {
-        var authentication = simpleAuthFromContext();
-        return Mono.zip(
-            userService.getById(authentication.getUserId()),
-            getById(id)
-        ).flatMap((pair) -> {
-            var user = pair.getT1();
-            var post = pair.getT2();
+        return simpleAuthFromContext().flatMap(
+            authentication ->
+                Mono.zip(
+                    userService.getById(authentication.getUserId()),
+                    getById(id)
+                ).flatMap((pair) -> {
+                    var user = pair.getT1();
+                    var post = pair.getT2();
 
-            post.setDeletedAt(OffsetDateTime.now());
-            post.setDeletedByUserId(user.getId());
-            return repository.save(post);
-        }).then();
+                    post.setDeletedAt(OffsetDateTime.now());
+                    post.setDeletedByUserId(user.getId());
+                    return repository.save(post);
+                }).then()
+        );
     }
 }

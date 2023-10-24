@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+import reactor.core.publisher.Mono;
 
 import java.util.Collection;
 import java.util.List;
@@ -18,12 +20,19 @@ public class SimpleAuthentication implements Authentication {
     private final String name;
     private boolean authenticated = true;
 
-    public static SimpleAuthentication simpleAuthFromContext() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (SimpleAuthentication.class.isAssignableFrom(authentication.getClass())) {
-            return (SimpleAuthentication) authentication;
-        }
-        throw new IllegalStateException("Authentication is not SimpleAuthentication");
+    public static Mono<SimpleAuthentication> simpleAuthFromContext() {
+        return ReactiveSecurityContextHolder
+            .getContext()
+            .map(SecurityContext::getAuthentication)
+            .flatMap(authentication -> {
+                if (authentication == null) {
+                    return Mono.error(new IllegalStateException("Authentication is null"));
+                }
+                if (SimpleAuthentication.class.isAssignableFrom(authentication.getClass())) {
+                    return Mono.just((SimpleAuthentication) authentication);
+                }
+                return Mono.error(new IllegalStateException("Authentication is not SimpleAuthentication"));
+            });
     }
 
     @Override

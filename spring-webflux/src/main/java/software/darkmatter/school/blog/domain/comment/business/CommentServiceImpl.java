@@ -39,51 +39,57 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Mono<Comment> create(Long postId, CommentCreateDto createDto) {
-        var authentication = simpleAuthFromContext();
-        return userService.getById(authentication.getUserId())
-                          .flatMap(user -> {
-                              var comment = new Comment();
-                              comment.setPostId(postId);
-                              comment.setText(createDto.text());
-                              OffsetDateTime now = OffsetDateTime.now();
-                              comment.setCreatedAt(now);
-                              comment.setCreatedByUserId(user.getId());
-                              comment.setUpdatedAt(now);
-                              comment.setUpdatedByUserId(user.getId());
-                              return repository.save(comment);
-                          });
+        return simpleAuthFromContext().flatMap(
+            authentication ->
+                userService.getById(authentication.getUserId())
+                           .flatMap(user -> {
+                               var comment = new Comment();
+                               comment.setPostId(postId);
+                               comment.setText(createDto.text());
+                               OffsetDateTime now = OffsetDateTime.now();
+                               comment.setCreatedAt(now);
+                               comment.setCreatedByUserId(user.getId());
+                               comment.setUpdatedAt(now);
+                               comment.setUpdatedByUserId(user.getId());
+                               return repository.save(comment);
+                           })
+        );
     }
 
     @Override
     public Mono<Comment> update(Long id, CommentUpdateDto updateDto) {
-        var authentication = simpleAuthFromContext();
-        return Mono.zip(
-            userService.getById(authentication.getUserId()),
-            getById(id)
-        ).flatMap(pair -> {
-            var user = pair.getT1();
-            var comment = pair.getT2();
+        return simpleAuthFromContext().flatMap(
+            authentication ->
+                Mono.zip(
+                    userService.getById(authentication.getUserId()),
+                    getById(id)
+                ).flatMap(pair -> {
+                    var user = pair.getT1();
+                    var comment = pair.getT2();
 
-            comment.setText(updateDto.text());
-            comment.setUpdatedAt(OffsetDateTime.now());
-            comment.setUpdatedByUserId(user.getId());
-            return repository.save(comment);
-        });
+                    comment.setText(updateDto.text());
+                    comment.setUpdatedAt(OffsetDateTime.now());
+                    comment.setUpdatedByUserId(user.getId());
+                    return repository.save(comment);
+                })
+        );
     }
 
     @Override
     public Mono<Void> delete(Long id) {
-        var authentication = simpleAuthFromContext();
-        return Mono.zip(
-            userService.getById(authentication.getUserId()),
-            getById(id)
-        ).flatMap((pair) -> {
-            var user = pair.getT1();
-            var comment = pair.getT2();
+        return simpleAuthFromContext().flatMap(
+            authentication ->
+                Mono.zip(
+                    userService.getById(authentication.getUserId()),
+                    getById(id)
+                ).flatMap((pair) -> {
+                    var user = pair.getT1();
+                    var comment = pair.getT2();
 
-            comment.setDeletedAt(OffsetDateTime.now());
-            comment.setDeletedByUserId(user.getId());
-            return repository.save(comment);
-        }).then();
+                    comment.setDeletedAt(OffsetDateTime.now());
+                    comment.setDeletedByUserId(user.getId());
+                    return repository.save(comment);
+                }).then()
+        );
     }
 }
