@@ -9,7 +9,7 @@ public class PostNotFoundException extends NotFoundException {
     private final Long postId;
 
     public PostNotFoundException(Long postId) {
-        super("Post with id '" + postId + "' was not found ");
+        super("Post with id '" + postId + "' was not found.");
         this.postId = postId;
     }
 }

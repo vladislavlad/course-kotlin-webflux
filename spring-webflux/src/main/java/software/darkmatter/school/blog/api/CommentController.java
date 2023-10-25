@@ -68,17 +68,23 @@ public class CommentController {
     }
 
     private CommentDto convertToDto(Comment comment) {
+        UserDto createdBy;
+        if (comment.getCreatedBy() != null) {
+            createdBy = new UserDto(
+                comment.getCreatedByUserId(),
+                comment.getCreatedBy().getUsername(),
+                comment.getCreatedBy().getFirstName(),
+                comment.getCreatedBy().getLastName()
+            );
+        } else {
+            createdBy = new UserDto(comment.getCreatedByUserId(), null, null, null);
+        }
+
         return new CommentDto(
             comment.getId(),
             comment.getText(),
             comment.getCreatedAt(),
-            // TODO
-            new UserDto(
-                comment.getCreatedByUserId(),
-                "u",
-                "f",
-                "l"
-            ),
+            createdBy,
             comment.getUpdatedAt()
         );
     }

@@ -9,6 +9,7 @@ import software.darkmatter.school.blog.api.dto.CommentCreateDto;
 import software.darkmatter.school.blog.api.dto.CommentUpdateDto;
 import software.darkmatter.school.blog.domain.comment.data.Comment;
 import software.darkmatter.school.blog.domain.comment.data.CommentRepository;
+import software.darkmatter.school.blog.domain.comment.error.CommentNotFoundException;
 import software.darkmatter.school.blog.domain.user.business.UserService;
 
 import java.time.OffsetDateTime;
@@ -29,7 +30,18 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Mono<Comment> getById(Long id) {
-        return repository.findByIdAndDeletedAtIsNull(id);
+        return repository.findByIdAndDeletedAtIsNull(id)
+                         .switchIfEmpty(
+                             Mono.error(() -> new CommentNotFoundException(id))
+                         ).flatMap(post ->
+                                       userService.getById(post.getCreatedByUserId())
+                                                  .map(
+                                                      user -> {
+                                                          post.setCreatedBy(user);
+                                                          return post;
+                                                      }
+                                                  )
+            );
     }
 
     @Override
