@@ -36,10 +36,10 @@ class UserController(private val userService: UserService) {
 
     private fun convertToDto(user: User): UserDto {
         return UserDto(
-            user.id!!,
-            user.username,
-            user.firstName,
-            user.lastName,
+            id = user.id!!,
+            username = user.username,
+            firstName = user.firstName,
+            lastName = user.lastName,
         )
     }
 }

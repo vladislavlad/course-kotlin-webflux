@@ -10,6 +10,7 @@ import software.darkmatter.school.blog.api.dto.CommentUpdateDto;
 import software.darkmatter.school.blog.domain.comment.data.Comment;
 import software.darkmatter.school.blog.domain.comment.data.CommentRepository;
 import software.darkmatter.school.blog.domain.comment.error.CommentNotFoundException;
+import software.darkmatter.school.blog.domain.post.business.PostService;
 import software.darkmatter.school.blog.domain.user.business.UserService;
 
 import java.time.OffsetDateTime;
@@ -22,6 +23,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository repository;
     private final UserService userService;
+    private final PostService postService;
 
     @Override
     public Flux<Comment> getListByPostId(Long postId, Pageable pageable) {
@@ -52,19 +54,20 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public Mono<Comment> create(Long postId, CommentCreateDto createDto) {
         return simpleAuthFromContext().flatMap(
-            authentication ->
-                userService.getById(authentication.getUserId())
-                           .flatMap(user -> {
-                               var comment = new Comment();
-                               comment.setPostId(postId);
-                               comment.setText(createDto.text());
-                               OffsetDateTime now = OffsetDateTime.now();
-                               comment.setCreatedAt(now);
-                               comment.setCreatedByUserId(user.getId());
-                               comment.setUpdatedAt(now);
-                               comment.setUpdatedByUserId(user.getId());
-                               return repository.save(comment);
-                           })
+            authentication -> postService.getById(postId).flatMap(
+                post -> userService.getById(authentication.getUserId()).flatMap(
+                    user -> {
+                        var comment = new Comment();
+                        comment.setPostId(postId);
+                        comment.setText(createDto.text());
+                        OffsetDateTime now = OffsetDateTime.now();
+                        comment.setCreatedAt(now);
+                        comment.setCreatedByUserId(user.getId());
+                        comment.setUpdatedAt(now);
+                        comment.setUpdatedByUserId(user.getId());
+                        return repository.save(comment);
+                    })
+            )
         );
     }
 

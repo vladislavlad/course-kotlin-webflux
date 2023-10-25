@@ -6,7 +6,7 @@ data class PostDto(
     val id: Long,
     val title: String?,
     val summary: String?,
-    val text: String?,
+    val content: String?,
     val createdAt: OffsetDateTime,
     val createdBy: UserDto,
     val updatedAt: OffsetDateTime,

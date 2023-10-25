@@ -19,15 +19,13 @@ class PostServiceImpl(
     private val userService: UserService,
 ) : PostService {
 
-    override suspend fun getList(pageable: Pageable): List<Post> {
-        return repository.findAllByDeletedAtIsNull(pageable).toList()
-    }
+    override suspend fun getList(pageable: Pageable): List<Post> =
+        repository.findAllByDeletedAtIsNull(pageable).toList()
 
     override suspend fun getById(id: Long): Post {
         val post = repository.findByIdAndDeletedAtIsNull(id) ?: throw PostNotFoundException(id)
+        post.createdBy = userService.getById(post.createdByUserId)
 
-        val user = userService.getById(post.createdByUserId)
-        post.createdBy = user
         return post
     }
 
@@ -57,40 +55,35 @@ class PostServiceImpl(
 
     @Transactional
     override suspend fun update(id: Long, postCreateDto: PostCreateDto): Post {
-        return simpleAuthFromContext()
-            .let { authentication ->
-                val user = userService.getById(authentication.userId)
-                val post = getById(id)
+        val authentication = simpleAuthFromContext()
+        val user = userService.getById(authentication.userId)
+        val post = getById(id)
 
-                post.title = postCreateDto.title
-                post.summary = postCreateDto.summary
-                post.content = postCreateDto.content
-                post.updatedAt = OffsetDateTime.now()
-                post.updatedByUserId = user.id!!
-                repository.save(post).awaitSingle()
-            }
+        post.title = postCreateDto.title
+        post.summary = postCreateDto.summary
+        post.content = postCreateDto.content
+        post.updatedAt = OffsetDateTime.now()
+        post.updatedByUserId = user.id!!
+
+        return repository.save(post).awaitSingle()
     }
 
     @Transactional
-    override suspend fun publish(id: Long) =
-        getById(id).let {
-            it.publishedAt = OffsetDateTime.now()
-            repository.save(it).awaitSingle()
+    override suspend fun publish(id: Long) {
+        val post = getById(id)
 
-            Unit
-        }
+        post.publishedAt = OffsetDateTime.now()
+        repository.save(post).awaitSingle()
+    }
 
     @Transactional
-    override suspend fun delete(id: Long) =
-        simpleAuthFromContext()
-            .let { authentication ->
-                val user = userService.getById(authentication.userId)
-                val post = getById(id)
+    override suspend fun delete(id: Long) {
+        val authentication = simpleAuthFromContext()
+        val user = userService.getById(authentication.userId)
+        val post = getById(id)
 
-                post.deletedAt = OffsetDateTime.now()
-                post.deletedByUserId = user.id!!
-                repository.save(post).awaitSingle()
-
-                Unit
-            }
+        post.deletedAt = OffsetDateTime.now()
+        post.deletedByUserId = user.id!!
+        repository.save(post).awaitSingle()
+    }
 }

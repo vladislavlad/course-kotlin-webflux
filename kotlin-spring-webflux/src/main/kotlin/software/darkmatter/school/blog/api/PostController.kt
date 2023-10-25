@@ -63,19 +63,19 @@ class PostController(
 
     private fun convertToDto(post: Post): PostDto {
         return PostDto(
-            post.id!!,
-            post.title,
-            post.summary,
-            post.content,
-            post.createdAt,
-            UserDto(
+            id = post.id!!,
+            title = post.title,
+            summary = post.summary,
+            content = post.content,
+            createdAt = post.createdAt,
+            createdBy = UserDto(
                 post.createdByUserId,
                 post.createdBy?.username,
                 post.createdBy?.firstName,
                 post.createdBy?.lastName,
             ),
-            post.updatedAt,
-            post.publishedAt,
+            updatedAt = post.updatedAt,
+            publishedAt = post.publishedAt,
         )
     }
 }
