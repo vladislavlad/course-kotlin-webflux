@@ -11,3 +11,6 @@ spring:
     password: blog
 server:
   port: 8080
+
+random-api-client:
+  host: http://localhost:8020
