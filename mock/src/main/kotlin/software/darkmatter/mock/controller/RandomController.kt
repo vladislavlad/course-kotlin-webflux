@@ -16,11 +16,18 @@ class RandomController {
     @GetMapping
     suspend fun random(): RandomResponse {
         runBlocking {
-            delay(Random.nextLong(10, 50))
+            delay(randomMillis())
         }
         return RandomResponse(
             code = Random.nextInt(1000000, 1999999).toString().slice(1..6),
             uuid = UUID.randomUUID(),
         )
     }
+
+    private fun randomMillis(): Long =
+        if (Random.nextInt(1, 100) > 95) {
+            Random.nextLong(50, 100)
+        } else {
+            Random.nextLong(5, 25)
+        }
 }
