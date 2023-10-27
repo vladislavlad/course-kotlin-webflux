@@ -43,11 +43,11 @@ class CommentController(
     ): CommentDto = convertToDto(service.getByPostIdAndId(postId, id))
 
     @PostMapping("/posts/{postId}/comments")
-    suspend fun create(@PathVariable postId: Long, @RequestBody commentCreateDto: @Valid CommentCreateDto): CommentDto =
+    suspend fun create(@PathVariable postId: Long, @Valid @RequestBody commentCreateDto: CommentCreateDto): CommentDto =
         convertToDto(service.create(postId, commentCreateDto))
 
     @PutMapping("/comments/{id}")
-    suspend fun update(@PathVariable id: Long, @RequestBody updateDto: CommentUpdateDto): CommentDto =
+    suspend fun update(@PathVariable id: Long, @Valid @RequestBody updateDto: CommentUpdateDto): CommentDto =
         convertToDto(service.update(id, updateDto))
 
     @DeleteMapping("/comments/{id}")
@@ -62,6 +62,7 @@ class CommentController(
             createdAt = comment.createdAt,
             createdBy = UserDto(
                 comment.createdByUserId,
+                comment.createdBy?.uuid,
                 comment.createdBy?.username,
                 comment.createdBy?.firstName,
                 comment.createdBy?.lastName

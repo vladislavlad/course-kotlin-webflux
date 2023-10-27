@@ -1,5 +1,6 @@
 package software.darkmatter.school.blog.api
 
+import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -27,7 +28,7 @@ class UserController(private val userService: UserService) {
 
     @PutMapping("/{id}")
     suspend fun update(
-        @PathVariable id: Long, @RequestBody userCreateDto: UserCreateDto
+        @PathVariable id: Long, @Valid @RequestBody userCreateDto: UserCreateDto
     ) = convertToDto(userService.update(id, userCreateDto))
 
     @DeleteMapping("/{id}")
@@ -37,6 +38,7 @@ class UserController(private val userService: UserService) {
     private fun convertToDto(user: User): UserDto {
         return UserDto(
             id = user.id!!,
+            uuid = user.uuid,
             username = user.username,
             firstName = user.firstName,
             lastName = user.lastName,
