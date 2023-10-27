@@ -77,6 +77,7 @@ public class CommentController {
             comment.getCreatedAt(),
             new UserDto(
                 comment.getCreatedBy().getId(),
+                comment.getCreatedBy().getUuid(),
                 comment.getCreatedBy().getUsername(),
                 comment.getCreatedBy().getFirstName(),
                 comment.getCreatedBy().getLastName()

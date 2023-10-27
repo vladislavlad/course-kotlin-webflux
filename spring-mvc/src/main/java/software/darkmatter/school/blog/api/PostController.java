@@ -77,6 +77,7 @@ public class PostController {
             post.getCreatedAt(),
             new UserDto(
                 post.getCreatedBy().getId(),
+                post.getCreatedBy().getUuid(),
                 post.getCreatedBy().getUsername(),
                 post.getCreatedBy().getFirstName(),
                 post.getCreatedBy().getLastName()

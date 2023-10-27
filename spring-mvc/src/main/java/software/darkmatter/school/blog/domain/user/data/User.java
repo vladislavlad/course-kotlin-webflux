@@ -8,6 +8,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -17,6 +18,8 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private UUID uuid;
 
     private String username;
 
