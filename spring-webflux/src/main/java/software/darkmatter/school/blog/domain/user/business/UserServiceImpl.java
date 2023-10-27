@@ -12,6 +12,8 @@ import software.darkmatter.school.blog.domain.user.data.UserRepository;
 import software.darkmatter.school.blog.domain.user.error.UserNotFoundException;
 
 import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Flux<User> getListByIds(List<Long> ids) {
+        return repository.findAllByIdIn(ids);
+    }
+
+    @Override
     public Mono<User> getById(Long id) {
         return repository.findByIdAndDeletedAtIsNull(id).switchIfEmpty(
             Mono.error(() -> new UserNotFoundException(id))
@@ -35,6 +42,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Mono<User> create(UserCreateDto userCreateDto) {
         User user = new User();
+        user.setUuid(UUID.randomUUID());
         user.setFirstName(userCreateDto.firstName());
         user.setLastName(userCreateDto.lastName());
         OffsetDateTime now = OffsetDateTime.now();

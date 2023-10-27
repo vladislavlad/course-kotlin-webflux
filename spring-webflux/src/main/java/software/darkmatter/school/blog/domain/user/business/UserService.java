@@ -12,7 +12,7 @@ public interface UserService {
 
     Flux<User> getList(Pageable pageable);
 
-    Flux<User> getListByIds(List<Long> ids, Pageable pageable);
+    Flux<User> getListByIds(List<Long> ids);
 
     Mono<User> getById(Long id);
 
