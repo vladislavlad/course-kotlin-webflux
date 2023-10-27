@@ -5,13 +5,16 @@ import kotlinx.coroutines.runBlocking
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import software.darkmatter.mock.business.CodeGenerator
 import software.darkmatter.mock.dto.RandomResponse
 import java.util.UUID
 import kotlin.random.Random
 
 @RestController
 @RequestMapping("/api/random")
-class RandomController {
+class RandomController(
+    private val codeGenerator: CodeGenerator,
+) {
 
     @GetMapping
     suspend fun random(): RandomResponse {
@@ -19,7 +22,7 @@ class RandomController {
             delay(randomMillis())
         }
         return RandomResponse(
-            code = Random.nextInt(1000000, 1999999).toString().slice(1..6),
+            code = codeGenerator.generate(),
             uuid = UUID.randomUUID(),
         )
     }
