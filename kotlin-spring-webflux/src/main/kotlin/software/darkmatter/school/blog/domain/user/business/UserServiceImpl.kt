@@ -10,6 +10,7 @@ import software.darkmatter.school.blog.domain.user.domain.User
 import software.darkmatter.school.blog.domain.user.domain.UserRepository
 import software.darkmatter.school.blog.domain.user.error.UserNotFoundException
 import java.time.OffsetDateTime
+import java.util.UUID
 
 @Service
 class UserServiceImpl(
@@ -19,6 +20,9 @@ class UserServiceImpl(
     override suspend fun getList(pageable: Pageable): List<User> =
         repository.findAllByDeletedAtIsNull(pageable).toList()
 
+    override suspend fun getListByIds(ids: List<Long>): List<User> =
+        repository.findAllByIdIn(ids).toList()
+
     override suspend fun getById(id: Long): User =
         repository.findByIdAndDeletedAtIsNull(id)
             ?: throw UserNotFoundException(id)
@@ -27,6 +31,7 @@ class UserServiceImpl(
     override suspend fun create(userCreateDto: UserCreateDto): User {
         val user = User(
             id = null,
+            uuid = UUID.randomUUID(),
             username = userCreateDto.username!!,
             firstName = userCreateDto.firstName!!,
             lastName = userCreateDto.lastName!!,

@@ -24,7 +24,8 @@ class UserController(private val userService: UserService) {
     suspend fun getById(@PathVariable id: Long) = convertToDto(userService.getById(id))
 
     @PostMapping
-    suspend fun create(@RequestBody userCreateDto: UserCreateDto) = convertToDto(userService.create(userCreateDto))
+    suspend fun create(@Valid @RequestBody userCreateDto: UserCreateDto) =
+        convertToDto(userService.create(userCreateDto))
 
     @PutMapping("/{id}")
     suspend fun update(

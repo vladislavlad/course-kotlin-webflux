@@ -9,4 +9,6 @@ interface UserRepository : ReactiveCrudRepository<User, Long> {
     suspend fun findByIdAndDeletedAtIsNull(id: Long?): User?
 
     fun findAllByDeletedAtIsNull(pageable: Pageable): Flow<User>
+
+    fun findAllByIdIn(ids: List<Long>): Flow<User>
 }
