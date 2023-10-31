@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import software.darkmatter.school.blog.api.dto.PostCreateDto
 import software.darkmatter.school.blog.api.dto.PostDto
+import software.darkmatter.school.blog.api.dto.PostPublishDto
 import software.darkmatter.school.blog.api.dto.UserDto
 import software.darkmatter.school.blog.domain.post.business.PostService
 import software.darkmatter.school.blog.domain.post.data.Post
@@ -40,12 +41,12 @@ class PostController(
     }
 
     @PostMapping
-    suspend fun create(@RequestBody body: @Valid PostCreateDto): PostDto {
+    suspend fun create(@Valid @RequestBody body: PostCreateDto): PostDto {
         return convertToDto(service.create(body))
     }
 
     @PutMapping("/{id}")
-    suspend fun update(@PathVariable id: Long, @RequestBody body: @Valid PostCreateDto): PostDto {
+    suspend fun update(@PathVariable id: Long, @Valid @RequestBody body: PostCreateDto): PostDto {
         return convertToDto(service.update(id, body))
     }
 
@@ -57,8 +58,8 @@ class PostController(
 
     @PostMapping("/{id}/publish")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    suspend fun publish(@PathVariable id: Long) {
-        service.publish(id)
+    suspend fun publish(@PathVariable id: Long, @Valid @RequestBody body: PostPublishDto) {
+        service.publish(id, body)
     }
 
     private fun convertToDto(post: Post): PostDto {
@@ -70,6 +71,7 @@ class PostController(
             createdAt = post.createdAt,
             createdBy = UserDto(
                 post.createdByUserId,
+                post.createdBy?.uuid,
                 post.createdBy?.username,
                 post.createdBy?.firstName,
                 post.createdBy?.lastName,
