@@ -9,5 +9,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/blog
     user: blog
     password: blog
+
 server:
   port: 8070
+
+code-api-client:
+  host: http://localhost:8020
