@@ -72,12 +72,13 @@ public class CommentController {
         if (comment.getCreatedBy() != null) {
             createdBy = new UserDto(
                 comment.getCreatedByUserId(),
+                comment.getCreatedBy().getUuid(),
                 comment.getCreatedBy().getUsername(),
                 comment.getCreatedBy().getFirstName(),
                 comment.getCreatedBy().getLastName()
             );
         } else {
-            createdBy = new UserDto(comment.getCreatedByUserId(), null, null, null);
+            createdBy = new UserDto(comment.getCreatedByUserId(), null, null, null, null);
         }
 
         return new CommentDto(

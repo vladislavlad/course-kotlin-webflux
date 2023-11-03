@@ -1,6 +1,7 @@
 package software.darkmatter.school.blog.api;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,8 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.darkmatter.school.blog.api.dto.UserCreateDto;
 import software.darkmatter.school.blog.api.dto.UserDto;
@@ -27,6 +30,15 @@ public class UserController {
     @GetMapping("/{id}")
     public Mono<UserDto> getById(@PathVariable Long id) {
         return service.getById(id)
+                      .map(this::convertToDto);
+    }
+
+    @GetMapping
+    public Flux<UserDto> list(
+        @RequestParam(defaultValue = "0") Integer page,
+        @RequestParam(defaultValue = "20") Integer size
+    ) {
+        return service.getList(Pageable.ofSize(size).withPage(page))
                       .map(this::convertToDto);
     }
 
@@ -51,6 +63,7 @@ public class UserController {
     private UserDto convertToDto(User user) {
         return new UserDto(
             user.getId(),
+            user.getUuid(),
             user.getUsername(),
             user.getFirstName(),
             user.getLastName()

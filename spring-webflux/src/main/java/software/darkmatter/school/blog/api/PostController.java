@@ -70,12 +70,13 @@ public class PostController {
         if (post.getCreatedBy() != null) {
             createdBy = new UserDto(
                 post.getCreatedByUserId(),
+                post.getCreatedBy().getUuid(),
                 post.getCreatedBy().getUsername(),
                 post.getCreatedBy().getFirstName(),
                 post.getCreatedBy().getLastName()
             );
         } else {
-            createdBy = new UserDto(post.getCreatedByUserId(), null, null, null);
+            createdBy = new UserDto(post.getCreatedByUserId(), null, null, null, null);
         }
 
         return new PostDto(
