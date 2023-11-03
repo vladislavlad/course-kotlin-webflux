@@ -1,6 +1,7 @@
 package software.darkmatter.school.blog.api
 
 import jakarta.validation.Valid
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 import software.darkmatter.school.blog.api.dto.UserCreateDto
@@ -22,6 +24,14 @@ class UserController(private val userService: UserService) {
 
     @GetMapping("/{id}")
     suspend fun getById(@PathVariable id: Long) = convertToDto(userService.getById(id))
+
+    @GetMapping
+    suspend fun getList(
+        @RequestParam(defaultValue = "0") page: Int?,
+        @RequestParam(defaultValue = "20") size: Int?
+    ): List<UserDto> =
+        userService.getList(Pageable.ofSize(size!!).withPage(page!!))
+            .map { convertToDto(it) }
 
     @PostMapping
     suspend fun create(@Valid @RequestBody userCreateDto: UserCreateDto) =

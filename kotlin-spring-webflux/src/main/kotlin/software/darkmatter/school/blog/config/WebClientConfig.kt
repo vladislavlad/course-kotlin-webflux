@@ -9,19 +9,19 @@ import org.springframework.validation.annotation.Validated
 import org.springframework.web.reactive.function.client.WebClient
 
 @Configuration
-@EnableConfigurationProperties(WebClientConfig.RandomApiClientProperties::class)
+@EnableConfigurationProperties(WebClientConfig.CodeApiClientProperties::class)
 class WebClientConfig(
-    private val props: RandomApiClientProperties,
+    private val props: CodeApiClientProperties,
 ) {
 
     @Bean
-    fun webClient() = WebClient.builder()
+    fun codeWebClient() = WebClient.builder()
         .baseUrl(props.host!!)
         .build()
 
     @Validated
-    @ConfigurationProperties(prefix = "random-api-client")
-    class RandomApiClientProperties {
+    @ConfigurationProperties(prefix = "code-api-client")
+    class CodeApiClientProperties {
 
         @field:NotNull
         var host: String? = null

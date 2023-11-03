@@ -1,8 +1,8 @@
 package software.darkmatter.school.blog.domain.code.rest
 
-import io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT
-import io.netty.handler.codec.http.HttpResponseStatus.OK
-import io.netty.handler.codec.http.HttpResponseStatus.UNPROCESSABLE_ENTITY
+import org.springframework.http.HttpStatus.NO_CONTENT
+import org.springframework.http.HttpStatus.OK
+import org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.client.WebClient
@@ -20,7 +20,7 @@ class CodeApiClientWebClient(
     override suspend fun createCode(request: CodeCreateRequest): ApiResult =
         webClient.post()
             .uri("/api/code")
-            .body(request, CodeCreateRequest::class.java)
+            .body(Mono.just(request), CodeCreateRequest::class.java)
             .accept(MediaType.APPLICATION_JSON)
             .awaitExchange { response ->
                 when (val statusCode = response.statusCode()) {
