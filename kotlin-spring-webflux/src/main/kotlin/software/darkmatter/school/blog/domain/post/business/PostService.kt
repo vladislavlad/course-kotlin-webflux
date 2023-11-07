@@ -11,5 +11,5 @@ interface PostService {
     suspend fun create(postCreateDto: PostCreateDto): Post
     suspend fun update(id: Long, postCreateDto: PostCreateDto): Post
     suspend fun delete(id: Long)
-    suspend fun publish(id: Long, body: PostPublishDto)
+    suspend fun publish(id: Long, postPublishDto: PostPublishDto)
 }

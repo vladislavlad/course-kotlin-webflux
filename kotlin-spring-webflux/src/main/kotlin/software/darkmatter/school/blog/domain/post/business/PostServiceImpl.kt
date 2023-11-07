@@ -13,6 +13,7 @@ import software.darkmatter.school.blog.domain.code.rest.CodeApiClient
 import software.darkmatter.school.blog.domain.code.rest.dto.CodeCheckRequest
 import software.darkmatter.school.blog.domain.post.data.Post
 import software.darkmatter.school.blog.domain.post.data.PostRepository
+import software.darkmatter.school.blog.domain.post.error.PostAlreadyPublishedException
 import software.darkmatter.school.blog.domain.post.error.PostNotFoundException
 import software.darkmatter.school.blog.domain.user.business.UserService
 import software.darkmatter.school.blog.error.NotAuthorizedException
@@ -75,7 +76,7 @@ class PostServiceImpl(
     }
 
     @Transactional
-    override suspend fun publish(id: Long, body: PostPublishDto) {
+    override suspend fun publish(id: Long, postPublishDto: PostPublishDto) {
         val authentication = simpleAuthFromContext()
         val user = userService.getById(authentication.userId)
 
@@ -83,8 +84,11 @@ class PostServiceImpl(
         if (post.createdByUserId != user.id)
             throw NotAuthorizedException("You are not allowed to publish this post")
 
-        val checkCodeResult = codeApiClient.checkCode(CodeCheckRequest(user.uuid, body.code!!))
-        if (checkCodeResult.status != NO_CONTENT.code())
+        if (post.publishedAt != null)
+            throw PostAlreadyPublishedException()
+
+        val codeCheckResult = codeApiClient.checkCode(CodeCheckRequest(user.uuid, postPublishDto.code!!))
+        if (codeCheckResult.status != NO_CONTENT.code())
             throw NotAuthorizedException("Invalid code")
 
         post.publishedAt = OffsetDateTime.now()
