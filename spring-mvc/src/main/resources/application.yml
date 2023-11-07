@@ -8,5 +8,10 @@ spring:
       ddl-auto: validate
   flyway:
     baseline-on-migrate: true
+
 server:
   port: 8060
+
+code-api-client:
+  host: http://localhost:8020
+
