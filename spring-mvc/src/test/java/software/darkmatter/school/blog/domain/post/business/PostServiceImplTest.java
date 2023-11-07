@@ -5,7 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.AdditionalAnswers;
 import org.springframework.security.core.context.SecurityContextHolder;
 import software.darkmatter.school.blog.api.dto.PostCreateDto;
+import software.darkmatter.school.blog.api.dto.PostPublishDto;
 import software.darkmatter.school.blog.config.security.SimpleAuthentication;
+import software.darkmatter.school.blog.domain.code.rest.CodeApiClient;
+import software.darkmatter.school.blog.domain.code.rest.dto.ApiResult;
+import software.darkmatter.school.blog.domain.code.rest.dto.CodeCheckRequest;
 import software.darkmatter.school.blog.domain.post.data.Post;
 import software.darkmatter.school.blog.domain.post.data.PostRepository;
 import software.darkmatter.school.blog.domain.post.error.PostNotFoundException;
@@ -17,9 +21,11 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static software.darkmatter.school.blog.domain.Constants.TEST_USER;
 
 public class PostServiceImplTest {
@@ -28,7 +34,9 @@ public class PostServiceImplTest {
 
     private final UserService userService = mock();
 
-    private final PostService service = new PostServiceImpl(repository, userService);
+    private final CodeApiClient codeApiClient = mock();
+
+    private final PostService service = new PostServiceImpl(repository, userService, codeApiClient);
 
     private static final Long USER_ID = 1L;
 
@@ -46,7 +54,9 @@ public class PostServiceImplTest {
         post.setSummary("summary");
         post.setContent("content");
         post.setCreatedAt(now);
+        post.setCreatedBy(TEST_USER);
         post.setUpdatedAt(now);
+        post.setUpdatedBy(TEST_USER);
         post.setPublishedAt(null);
 
         SecurityContextHolder.getContext().setAuthentication(new SimpleAuthentication(TEST_USER.getId(), TEST_USER.getFirstName()));
@@ -111,10 +121,13 @@ public class PostServiceImplTest {
     public void publish() {
         when(repository.findByIdAndDeletedAtIsNull(POST_ID)).thenReturn(Optional.of(post));
         when(repository.save(any())).then(AdditionalAnswers.returnsFirstArg());
+        when(userService.getById(USER_ID)).thenReturn(TEST_USER);
+        when(codeApiClient.checkCode(eq(new CodeCheckRequest(TEST_USER.getUuid(), "123456"))))
+            .thenReturn(new ApiResult(NO_CONTENT.value(), null));
 
         OffsetDateTime updatedAt = post.getUpdatedAt();
 
-        service.publish(1L);
+        service.publish(1L, new PostPublishDto("123456"));
 
         verify(repository).findByIdAndDeletedAtIsNull(POST_ID);
         verify(repository).save(any());

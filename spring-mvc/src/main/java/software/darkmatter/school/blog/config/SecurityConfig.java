@@ -7,8 +7,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
+import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
 import org.springframework.security.config.annotation.web.configurers.LogoutConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
@@ -26,14 +30,16 @@ public class SecurityConfig implements WebSecurityCustomizer {
         http
             .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(
-                requestMatcherRegistry -> requestMatcherRegistry.anyRequest().authenticated()
+                requestMatcherRegistry -> requestMatcherRegistry
+                    .requestMatchers("/error/**").permitAll()
+                    .anyRequest().authenticated()
             )
-            .logout(LogoutConfigurer::permitAll)
-            .sessionManagement(AbstractHttpConfigurer::disable)
-            .formLogin(AbstractHttpConfigurer::disable)
-            .httpBasic(AbstractHttpConfigurer::disable)
-            .cors(AbstractHttpConfigurer::disable)
-            .csrf(AbstractHttpConfigurer::disable);
+            .logout(LogoutConfigurer::disable)
+            .sessionManagement(SessionManagementConfigurer::disable)
+            .formLogin(FormLoginConfigurer::disable)
+            .httpBasic(HttpBasicConfigurer::disable)
+            .cors(CorsConfigurer::disable)
+            .csrf(CsrfConfigurer::disable);
 
         return http.build();
     }

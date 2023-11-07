@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
     public User create(UserCreateDto userCreateDto) {
         User user = new User();
         user.setUuid(UUID.randomUUID());
+        user.setUsername(userCreateDto.username());
         user.setFirstName(userCreateDto.firstName());
         user.setLastName(userCreateDto.lastName());
         user.setCreatedAt(OffsetDateTime.now());

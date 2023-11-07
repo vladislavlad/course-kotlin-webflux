@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import software.darkmatter.school.blog.api.dto.PostCreateDto;
 import software.darkmatter.school.blog.api.dto.PostDto;
+import software.darkmatter.school.blog.api.dto.PostPublishDto;
 import software.darkmatter.school.blog.api.dto.UserDto;
 import software.darkmatter.school.blog.domain.post.business.PostService;
 import software.darkmatter.school.blog.domain.post.data.Post;
@@ -64,8 +65,8 @@ public class PostController {
 
     @PostMapping("/{id}/publish")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public void publish(@PathVariable Long id) {
-        service.publish(id);
+    public void publish(@PathVariable Long id, @Valid @RequestBody PostPublishDto body) {
+        service.publish(id, body);
     }
 
     private PostDto convertToDto(Post post) {
