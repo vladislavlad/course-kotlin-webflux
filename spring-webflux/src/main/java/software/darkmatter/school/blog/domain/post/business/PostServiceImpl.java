@@ -7,13 +7,19 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.darkmatter.school.blog.api.dto.PostCreateDto;
+import software.darkmatter.school.blog.api.dto.PostPublishDto;
+import software.darkmatter.school.blog.domain.code.rest.CodeApiClient;
+import software.darkmatter.school.blog.domain.code.rest.dto.CodeCheckRequest;
 import software.darkmatter.school.blog.domain.post.data.Post;
 import software.darkmatter.school.blog.domain.post.data.PostRepository;
+import software.darkmatter.school.blog.domain.post.error.PostAlreadyPublishedException;
 import software.darkmatter.school.blog.domain.post.error.PostNotFoundException;
 import software.darkmatter.school.blog.domain.user.business.UserService;
+import software.darkmatter.school.blog.error.NotAuthorizedException;
 
 import java.time.OffsetDateTime;
 
+import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static software.darkmatter.school.blog.config.security.SimpleAuthentication.simpleAuthFromContext;
 
 @Service
@@ -22,6 +28,7 @@ public class PostServiceImpl implements PostService {
 
     private final PostRepository repository;
     private final UserService userService;
+    private final CodeApiClient codeApiClient;
 
     @Override
     public Flux<Post> getList(Pageable pageable) {
@@ -90,13 +97,37 @@ public class PostServiceImpl implements PostService {
 
     @Override
     @Transactional
-    public Mono<Void> publish(Long id) {
-        return getById(id)
-            .flatMap(post -> {
-                post.setPublishedAt(OffsetDateTime.now());
-                return repository.save(post);
-            })
-            .then();
+    public Mono<Void> publish(Long id, PostPublishDto postPublishDto) {
+        return simpleAuthFromContext().flatMap(
+            authentication ->
+                Mono.zip(
+                    userService.getById(authentication.getUserId()),
+                    getById(id)
+                ).flatMap((pair) -> {
+                    var user = pair.getT1();
+                    var post = pair.getT2();
+
+                    if (post.getPublishedAt() != null) {
+                        return Mono.error(new PostAlreadyPublishedException());
+                    }
+
+                    if (!post.getCreatedByUserId().equals(user.getId())) {
+                        return Mono.error(new NotAuthorizedException("You are not allowed to publish this post"));
+                    }
+
+                    return codeApiClient.checkCode(new CodeCheckRequest(user.getUuid(), postPublishDto.code()))
+                                        .flatMap(
+                                            codeCheckResult -> {
+                                                if (codeCheckResult.status() != NO_CONTENT.code()) {
+                                                    return Mono.error(new NotAuthorizedException("Invalid code"));
+                                                }
+
+                                                post.setPublishedAt(OffsetDateTime.now());
+                                                return repository.save(post);
+                                            }
+                                        );
+                }).then()
+        );
     }
 
     @Override

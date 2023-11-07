@@ -4,6 +4,7 @@ import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.darkmatter.school.blog.api.dto.PostCreateDto;
+import software.darkmatter.school.blog.api.dto.PostPublishDto;
 import software.darkmatter.school.blog.domain.post.data.Post;
 
 public interface PostService {
@@ -18,5 +19,5 @@ public interface PostService {
 
     Mono<Void> delete(Long id);
 
-    Mono<Void> publish(Long id);
+    Mono<Void> publish(Long id, PostPublishDto postPublishDto);
 }

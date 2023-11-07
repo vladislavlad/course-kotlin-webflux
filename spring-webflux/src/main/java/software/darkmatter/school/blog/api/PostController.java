@@ -18,6 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.darkmatter.school.blog.api.dto.PostCreateDto;
 import software.darkmatter.school.blog.api.dto.PostDto;
+import software.darkmatter.school.blog.api.dto.PostPublishDto;
 import software.darkmatter.school.blog.api.dto.UserDto;
 import software.darkmatter.school.blog.domain.post.business.PostService;
 import software.darkmatter.school.blog.domain.post.data.Post;
@@ -61,8 +62,8 @@ public class PostController {
 
     @PostMapping("/{id}/publish")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
-    public Mono<Void> publish(@PathVariable Long id) {
-        return service.publish(id);
+    public Mono<Void> publish(@PathVariable Long id, @Valid @RequestBody PostPublishDto body) {
+        return service.publish(id, body);
     }
 
     private PostDto convertToDto(Post post) {
