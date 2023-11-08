@@ -8,8 +8,8 @@ suspend fun randomDelay() {
 }
 
 private fun randomMillis(): Long =
-    if (Random.nextInt(1, 100) > 95) {
-        Random.nextLong(50, 100)
+    if (Random.nextInt(1, 100) > 90) {
+        Random.nextLong(100, 150)
     } else {
         Random.nextLong(5, 25)
     }
