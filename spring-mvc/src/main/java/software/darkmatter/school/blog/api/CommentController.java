@@ -42,7 +42,7 @@ public class CommentController {
     }
 
     @GetMapping("/comments/{id}")
-    public CommentDto getByPostIdAndId(@PathVariable Long id) {
+    public CommentDto getById(@PathVariable Long id) {
         return convertToDto(service.getById(id));
     }
 
@@ -60,7 +60,7 @@ public class CommentController {
     }
 
     @PutMapping("/comments/{id}")
-    public CommentDto update(@PathVariable Long id, @RequestBody CommentUpdateDto updateDto) {
+    public CommentDto update(@PathVariable Long id, @Valid @RequestBody CommentUpdateDto updateDto) {
         return convertToDto(service.update(id, updateDto));
     }
 

@@ -40,9 +40,10 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Comment getByPostIdAndId(Long postId, Long id) {
-        postService.getById(postId);
-        return getById(id);
+        return repository.findByIdAndPostAndDeletedAtIsNull(id, postService.getById(postId))
+                         .orElseThrow(() -> new CommentNotFoundException(id));
     }
 
     @Override

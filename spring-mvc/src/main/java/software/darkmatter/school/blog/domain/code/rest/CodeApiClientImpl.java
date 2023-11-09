@@ -33,19 +33,19 @@ public class CodeApiClientImpl implements CodeApiClient {
 
     @Override
     public ApiResult checkCode(CodeCheckRequest codeCheckRequest) {
-        return  restClient.post()
-                          .uri("/api/code/check")
-                          .body(codeCheckRequest)
-                          .exchange(
-                              (request, response) -> {
-                                  var status = (HttpStatus) response.getStatusCode();
-                                  return switch (status) {
-                                      case OK, CREATED -> buildApiResult(status);
-                                      case UNPROCESSABLE_ENTITY -> buildApiResult(status, "Code not valid");
-                                      default -> buildApiResult(status, "Unknown error");
-                                  };
-                              }
-                          );
+        return restClient.post()
+                         .uri("/api/code/check")
+                         .body(codeCheckRequest)
+                         .exchange(
+                             (request, response) -> {
+                                 var status = (HttpStatus) response.getStatusCode();
+                                 return switch (status) {
+                                     case OK, CREATED -> buildApiResult(status);
+                                     case UNPROCESSABLE_ENTITY -> buildApiResult(status, "Code not valid");
+                                     default -> buildApiResult(status, "Unknown error");
+                                 };
+                             }
+                         );
     }
 
     private static ApiResult buildApiResult(HttpStatus status) {
