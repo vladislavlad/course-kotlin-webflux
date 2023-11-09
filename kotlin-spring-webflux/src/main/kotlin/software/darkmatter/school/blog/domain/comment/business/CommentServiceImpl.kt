@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import software.darkmatter.school.blog.api.dto.CommentCreateDto
 import software.darkmatter.school.blog.api.dto.CommentUpdateDto
 import software.darkmatter.school.blog.config.security.SimpleAuthentication.Companion.simpleAuthFromContext
@@ -21,8 +22,10 @@ class CommentServiceImpl(
     private val postService: PostService
 ) : CommentService {
 
-    override suspend fun getListByPostId(postId: Long, pageable: Pageable): List<Comment> =
-        repository.findAllByPostIdAndDeletedAtIsNull(postId, pageable).toList()
+    override suspend fun getListByPostId(postId: Long, pageable: Pageable): List<Comment> {
+        postService.getById(postId)
+        return repository.findAllByPostIdAndDeletedAtIsNull(postId, pageable).toList()
+    }
 
     override suspend fun getById(id: Long): Comment {
         val comment = repository.findByIdAndDeletedAtIsNull(id) ?: throw CommentNotFoundException(id)
@@ -31,6 +34,7 @@ class CommentServiceImpl(
         return comment
     }
 
+    @Transactional(readOnly = true)
     override suspend fun getByPostIdAndId(postId: Long, id: Long): Comment {
         val comment = repository.findByPostIdAndIdAndDeletedAtIsNull(postId, id) ?: throw CommentNotFoundException(id)
         comment.createdBy = userService.getById(comment.createdByUserId)

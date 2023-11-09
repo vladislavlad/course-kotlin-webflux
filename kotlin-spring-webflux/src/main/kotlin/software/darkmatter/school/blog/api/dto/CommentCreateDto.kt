@@ -1,8 +1,7 @@
 package software.darkmatter.school.blog.api.dto
 
-import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.NotBlank
 
 data class CommentCreateDto(
-    @field:NotNull
-    val text: String?,
+    @field:NotBlank val text: String?,
 )
