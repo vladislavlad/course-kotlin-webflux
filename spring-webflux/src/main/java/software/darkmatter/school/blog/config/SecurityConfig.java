@@ -17,7 +17,6 @@ import org.springframework.security.web.server.authentication.ServerAuthenticati
 public class SecurityConfig {
 
     private final ReactiveAuthenticationManager authenticationManager;
-
     private final ServerAuthenticationConverter authenticationConverter;
 
     @Bean

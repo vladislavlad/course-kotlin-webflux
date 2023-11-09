@@ -3,6 +3,7 @@ package software.darkmatter.school.blog.domain.comment.business;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.darkmatter.school.blog.api.dto.CommentCreateDto;
@@ -27,28 +28,40 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Flux<Comment> getListByPostId(Long postId, Pageable pageable) {
-        return repository.findAllByPostIdAndDeletedAtIsNull(postId, pageable);
+        return postService.getById(postId).thenMany(
+            repository.findAllByPostIdAndDeletedAtIsNull(postId, pageable)
+        );
     }
 
     @Override
     public Mono<Comment> getById(Long id) {
         return repository.findByIdAndDeletedAtIsNull(id)
-                         .switchIfEmpty(
-                             Mono.error(() -> new CommentNotFoundException(id))
-                         ).flatMap(post ->
-                                       userService.getById(post.getCreatedByUserId())
-                                                  .map(
-                                                      user -> {
-                                                          post.setCreatedBy(user);
-                                                          return post;
-                                                      }
-                                                  )
-            );
+                         .switchIfEmpty(Mono.error(() -> new CommentNotFoundException(id)))
+                         .flatMap(comment ->
+                                      userService.getById(comment.getCreatedByUserId())
+                                                 .map(
+                                                     user -> {
+                                                         comment.setCreatedBy(user);
+                                                         return comment;
+                                                     }
+                                                 )
+                         );
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Mono<Comment> getByPostIdAndId(Long postId, Long id) {
-        return repository.findByPostIdAndIdAndDeletedAtIsNull(postId, id);
+        return repository.findByPostIdAndIdAndDeletedAtIsNull(postId, id)
+                         .switchIfEmpty(Mono.error(() -> new CommentNotFoundException(id)))
+                         .flatMap(comment ->
+                                      userService.getById(comment.getCreatedByUserId())
+                                                 .map(
+                                                     user -> {
+                                                         comment.setCreatedBy(user);
+                                                         return comment;
+                                                     }
+                                                 )
+                         );
     }
 
     @Override

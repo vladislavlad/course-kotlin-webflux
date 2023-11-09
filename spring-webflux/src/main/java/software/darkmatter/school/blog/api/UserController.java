@@ -1,5 +1,6 @@
 package software.darkmatter.school.blog.api;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -43,13 +44,13 @@ public class UserController {
     }
 
     @PostMapping
-    public Mono<UserDto> create(@RequestBody UserCreateDto userCreateDto) {
+    public Mono<UserDto> create(@Valid @RequestBody UserCreateDto userCreateDto) {
         return service.create(userCreateDto)
                       .map(this::convertToDto);
     }
 
     @PutMapping("/{id}")
-    public Mono<UserDto> update(@PathVariable Long id, @RequestBody UserCreateDto userCreateDto) {
+    public Mono<UserDto> update(@PathVariable Long id, @Valid @RequestBody UserCreateDto userCreateDto) {
         return service.update(id, userCreateDto)
                       .map(this::convertToDto);
     }

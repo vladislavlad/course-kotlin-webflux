@@ -38,17 +38,16 @@ public class PostServiceImpl implements PostService {
     @Override
     public Mono<Post> getById(Long id) {
         return repository.findByIdAndDeletedAtIsNull(id)
-                         .switchIfEmpty(
-                             Mono.error(() -> new PostNotFoundException(id))
-                         ).flatMap(post ->
-                                       userService.getById(post.getCreatedByUserId())
-                                                  .map(
-                                                      user -> {
-                                                          post.setCreatedBy(user);
-                                                          return post;
-                                                      }
-                                                  )
-            );
+                         .switchIfEmpty(Mono.error(() -> new PostNotFoundException(id)))
+                         .flatMap(post ->
+                                      userService.getById(post.getCreatedByUserId())
+                                                 .map(
+                                                     user -> {
+                                                         post.setCreatedBy(user);
+                                                         return post;
+                                                     }
+                                                 )
+                         );
     }
 
     @Override

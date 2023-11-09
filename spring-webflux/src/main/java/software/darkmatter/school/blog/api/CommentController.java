@@ -39,7 +39,7 @@ public class CommentController {
     }
 
     @GetMapping("/comments/{id}")
-    public Mono<CommentDto> getByPostIdAndId(@PathVariable Long id) {
+    public Mono<CommentDto> getById(@PathVariable Long id) {
         return service.getById(id).map(this::convertToDto);
     }
 
@@ -57,7 +57,7 @@ public class CommentController {
     }
 
     @PutMapping("/comments/{id}")
-    public Mono<CommentDto> update(@PathVariable Long id, @RequestBody CommentUpdateDto updateDto) {
+    public Mono<CommentDto> update(@PathVariable Long id, @Valid @RequestBody CommentUpdateDto updateDto) {
         return service.update(id, updateDto).map(this::convertToDto);
     }
 

@@ -33,9 +33,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Mono<User> getById(Long id) {
-        return repository.findByIdAndDeletedAtIsNull(id).switchIfEmpty(
-            Mono.error(() -> new UserNotFoundException(id))
-        );
+        return repository.findByIdAndDeletedAtIsNull(id)
+                         .switchIfEmpty(Mono.error(() -> new UserNotFoundException(id)));
     }
 
     @Override
