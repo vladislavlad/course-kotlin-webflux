@@ -1,12 +1,8 @@
 package software.darkmatter.school.blog.domain.comment.business;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.AdditionalAnswers;
-import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.context.SecurityContextImpl;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import software.darkmatter.school.blog.api.dto.CommentUpdateDto;
@@ -24,7 +20,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static software.darkmatter.school.blog.domain.Constants.TEST_CONTEXT;
 import static software.darkmatter.school.blog.domain.Constants.TEST_USER;
+import static software.darkmatter.school.blog.domain.Constants.TEST_USER_ID;
 
 public class CommentServiceImplTest {
 
@@ -40,7 +38,6 @@ public class CommentServiceImplTest {
 
     private Comment comment;
 
-
     @BeforeEach
     public void setUp() {
         OffsetDateTime now = OffsetDateTime.now();
@@ -50,7 +47,9 @@ public class CommentServiceImplTest {
         comment.setPostId(POST_ID);
         comment.setText("text");
         comment.setCreatedAt(now);
+        comment.setCreatedByUserId(TEST_USER_ID);
         comment.setUpdatedAt(now);
+        comment.setUpdatedByUserId(TEST_USER_ID);
 
         SecurityContextHolder.getContext().setAuthentication(new SimpleAuthentication(TEST_USER.getId(), TEST_USER.getFirstName()));
     }
@@ -58,14 +57,23 @@ public class CommentServiceImplTest {
     @Test
     public void getByIdNotFound() {
         when(repository.findByIdAndDeletedAtIsNull(COMMENT_ID)).thenReturn(Mono.just(comment));
-        when(repository.findById(2L)).thenThrow(new CommentNotFoundException(2L));
+        when(repository.findByIdAndDeletedAtIsNull(2L)).thenReturn(Mono.empty());
+        when(userService.getById(TEST_USER_ID)).thenAnswer(i -> Mono.just(TEST_USER));
 
-        StepVerifier.create(service.getById(COMMENT_ID))
+        var found = service.getById(COMMENT_ID)
+                           .contextWrite(TEST_CONTEXT);
+        // ???
+
+        StepVerifier.create(found)
                     .assertNext(comment -> assertThat(comment.getId()).isEqualTo(COMMENT_ID))
                     .verifyComplete();
         verify(repository).findByIdAndDeletedAtIsNull(COMMENT_ID);
 
-        StepVerifier.create(service.getById(2L))
+        var notFound = service.getById(2L)
+                              .contextWrite(TEST_CONTEXT);
+        // ???
+
+        StepVerifier.create(notFound)
                     .verifyError(CommentNotFoundException.class);
         verify(repository).findByIdAndDeletedAtIsNull(2L);
     }
@@ -73,9 +81,12 @@ public class CommentServiceImplTest {
     @Test
     public void update() {
         when(repository.findByIdAndDeletedAtIsNull(COMMENT_ID)).thenReturn(Mono.just(comment));
-        when(repository.save(any())).then(AdditionalAnswers.returnsFirstArg());
+        when(repository.save(any())).thenAnswer(i -> Mono.just(i.getArguments()[0]));
+        when(userService.getById(TEST_USER_ID)).thenAnswer(i -> Mono.just(TEST_USER));
 
-        var updated = service.update(1L, new CommentUpdateDto("upd text"));
+        var updated = service.update(1L, new CommentUpdateDto("upd text"))
+                             .contextWrite(TEST_CONTEXT);
+        // ???
 
         StepVerifier.create(updated)
                     .assertNext(comment -> {
