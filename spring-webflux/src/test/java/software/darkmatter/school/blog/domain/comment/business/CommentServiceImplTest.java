@@ -62,7 +62,6 @@ public class CommentServiceImplTest {
 
         var found = service.getById(COMMENT_ID)
                            .contextWrite(TEST_CONTEXT);
-        // ???
 
         StepVerifier.create(found)
                     .assertNext(comment -> assertThat(comment.getId()).isEqualTo(COMMENT_ID))
@@ -71,7 +70,6 @@ public class CommentServiceImplTest {
 
         var notFound = service.getById(2L)
                               .contextWrite(TEST_CONTEXT);
-        // ???
 
         StepVerifier.create(notFound)
                     .verifyError(CommentNotFoundException.class);
@@ -86,7 +84,6 @@ public class CommentServiceImplTest {
 
         var updated = service.update(1L, new CommentUpdateDto("upd text"))
                              .contextWrite(TEST_CONTEXT);
-        // ???
 
         StepVerifier.create(updated)
                     .assertNext(comment -> {
